@@ -94,6 +94,15 @@ def get_chloride_threshold_norsok(
     """
     Calculate chloride threshold for pitting using NORSOK pH factor.
 
+    **WARNING (Codex Review 2025-10-19): YELLOW FLAG**
+    This function is NOT part of Phase 1 and is NOT used by any Phase 1 tools.
+
+    **TODO for Phase 2 (Stainless Pitting Tools):**
+    - Replace `baseline_threshold_mg_L=1000.0` with authoritative source
+    - Options: ASTM G48, ISO 18070, or NACE standards for Cl⁻ thresholds
+    - Document provenance for baseline value
+    - Current value is placeholder only (engineering judgment)
+
     This replaces exponential heuristics in authoritative_materials_data.py
     with a calculation based on NORSOK M-506 standard pH correction factors.
 
@@ -104,6 +113,7 @@ def get_chloride_threshold_norsok(
         temperature_C: Temperature in °C
         pH: pH value (3.5-6.5 per NORSOK M-506 Table A.1)
         baseline_threshold_mg_L: Baseline Cl⁻ threshold at pH 6.0, 25°C (mg/L)
+            **PLACEHOLDER VALUE** - No authoritative source (Codex Review flag)
 
     Returns:
         Chloride threshold in mg/L

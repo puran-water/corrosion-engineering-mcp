@@ -1,0 +1,149 @@
+# ============================================================================
+# Corrosion Engineering MCP Server - Dependencies
+# ============================================================================
+#
+# This file specifies all Python dependencies for the corrosion engineering
+# MCP server, organized by phase and purpose.
+#
+# Installation:
+#   - Uses parent directory venv312: ../venv312/
+#   - Install with: pip install -r requirements.txt
+#
+# Note: Can reuse venv312 from parent directory for consistency with
+# sister MCPs (degasser-design-mcp, water-chemistry-mcp, etc.)
+#
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# MCP Framework (Required - All Phases)
+# ----------------------------------------------------------------------------
+fastmcp>=0.1.0                # FastMCP framework for MCP server implementation
+
+# ----------------------------------------------------------------------------
+# Core Scientific Computing (Required - All Phases)
+# ----------------------------------------------------------------------------
+numpy>=1.24.0                 # Numerical arrays and mathematical operations
+scipy>=1.10.0                 # Scientific algorithms (integration, optimization)
+pandas>=2.0.0                 # Data manipulation and analysis
+pydantic>=2.0.0               # Data validation and settings management
+
+# ----------------------------------------------------------------------------
+# Chemistry Engines (Phase 1+)
+# ----------------------------------------------------------------------------
+phreeqpython>=1.5.5           # PHREEQC wrapper for aqueous chemistry speciation
+                              # Chosen over IPhreeqcPy for ecosystem consistency
+                              # with degasser-design-mcp and water-chemistry-mcp
+
+# pymatgen>=2023.0.0          # Phase 2 - Pourbaix diagram generation
+                              # Uncomment when implementing Phase 2
+
+# pycalphad>=0.10.0           # Phase 5 (Future) - CALPHAD thermodynamics
+                              # For high-temperature phases beyond PHREEQC scope
+
+# ----------------------------------------------------------------------------
+# Electrochemistry & Materials Science (Phase 2-3)
+# ----------------------------------------------------------------------------
+# impedance>=1.5.0            # Phase 2 - EIS fitting, polarization curve analysis
+                              # For galvanic corrosion and cathodic protection
+
+# matminer>=0.9.0             # Phase 3 - Materials feature extraction
+                              # For alloy properties, PREN calculation, CPT estimation
+
+# ----------------------------------------------------------------------------
+# Transport Phenomena (Phase 4)
+# ----------------------------------------------------------------------------
+# openpnm>=3.0.0              # Phase 4 - Pore-network transport modeling
+                              # For advanced coating diffusion beyond Zargarnezhad
+
+# ----------------------------------------------------------------------------
+# Psychrometrics (Phase 3)
+# ----------------------------------------------------------------------------
+# PsychroLib>=2.5.0           # Phase 3 - Psychrometric calculations
+                              # For CUI wetness fraction and dew point
+
+# ----------------------------------------------------------------------------
+# Uncertainty Quantification (Phase 4)
+# ----------------------------------------------------------------------------
+# SALib>=1.4.0                # Phase 4 - Sensitivity analysis and sampling
+                              # Latin Hypercube, Sobol indices for Monte Carlo
+
+# scikit-learn>=1.3.0         # Phase 4 - Additional sampling methods
+                              # For variance reduction in Monte Carlo
+
+# ----------------------------------------------------------------------------
+# Process Integration (Phase 5 - Future)
+# ----------------------------------------------------------------------------
+# dwsimopt                    # Phase 5 - DWSIM automation
+                              # For process simulation integration
+
+# watertap>=0.11.0            # Phase 5 - WaterTAP integration
+# pyomo>=6.7.0                # Phase 5 - Required by WaterTAP
+# idaes-pse>=2.2.0            # Phase 5 - Required by WaterTAP
+
+# ----------------------------------------------------------------------------
+# Data Loading & HTTP (Required - Phase 0+)
+# ----------------------------------------------------------------------------
+requests>=2.31.0              # HTTP library for loading GitHub data sources
+                              # Used by AuthoritativeMaterialDatabase to fetch
+                              # USNRL galvanic series and KittyCAD properties
+requests-cache>=1.1.0         # HTTP response caching per Codex recommendation
+                              # Avoids repeated external calls on server restart
+lxml>=4.9.0                   # XML parser for pandas.read_xml()
+                              # Required to load USNRL SeawaterPotentialData.xml
+
+# ----------------------------------------------------------------------------
+# Utilities (Required - All Phases)
+# ----------------------------------------------------------------------------
+python-dotenv>=1.0.0          # Environment variable management (.env files)
+pyyaml>=6.0                   # YAML configuration file parsing
+                              # Used by coating_permeability_db.py and
+                              # electrochemistry_db.py for hybrid approach
+
+# ----------------------------------------------------------------------------
+# Testing (Required - Development)
+# ----------------------------------------------------------------------------
+pytest>=7.0.0                 # Unit testing framework
+pytest-cov>=4.0.0             # Code coverage reporting
+pytest-asyncio>=0.21.0        # Async test support
+
+# ----------------------------------------------------------------------------
+# Optional: Visualization
+# ----------------------------------------------------------------------------
+# matplotlib>=3.7.0           # For plots (tornado diagrams, Pourbaix, etc.)
+# plotly>=5.0.0               # Interactive plots
+
+# ============================================================================
+# Installation Notes
+# ============================================================================
+#
+# Phase 0 (Current):
+#   pip install fastmcp numpy scipy pandas pydantic python-dotenv pyyaml requests requests-cache lxml pytest pytest-cov pytest-asyncio
+#
+# Phase 1:
+#   pip install phreeqpython>=1.5.5
+#
+# Phase 2:
+#   pip install pymatgen impedance
+#
+# Phase 3:
+#   pip install PsychroLib matminer
+#
+# Phase 4:
+#   pip install openpnm SALib scikit-learn
+#
+# Phase 5:
+#   (Contact for DWSIM integration instructions)
+#
+# ============================================================================
+# Version Compatibility
+# ============================================================================
+#
+# Python Version: 3.12+ (uses venv312 from parent directory)
+# Tested with: Python 3.12.x
+#
+# Conflicts to Note:
+# - phreeqpython may require specific numpy/pandas versions
+# - pymatgen has heavy dependencies (may conflict with other packages)
+# - WaterTAP requires specific IDAES/Pyomo versions
+#
+# ============================================================================

@@ -1,0 +1,34 @@
+{
+  "mcpServers": {
+    "corrosion-engineering-mcp": {
+      "type": "stdio",
+      "command": "/mnt/c/Users/hvksh/mcp-servers/venv312/Scripts/python.exe",
+      "args": [
+        "C:\\Users\\hvksh\\mcp-servers\\corrosion-engineering-mcp\\server.py"
+      ],
+      "env": {
+        "MCP_TIMEOUT": "600000",
+        "MCP_TOOL_TIMEOUT": "600",
+        "CORROSION_MCP_ROOT": "C:\\Users\\hvksh\\mcp-servers\\corrosion-engineering-mcp"
+      }
+    },
+    "corrosion-kb": {
+      "command": "/home/hvksh/knowledgebase/.venv/bin/python",
+      "args": [
+        "/home/hvksh/knowledgebase/server.py",
+        "stdio"
+      ],
+      "env": {
+        "OLLAMA_MODEL": "snowflake-arctic-embed:xs",
+        "QDRANT_URL": "http://localhost:6333",
+        "NOMIC_KB_SCOPES": "{\"corrosion_kb\":{\"collection\":\"corrosion_kb\",\"title\":\"Corrosion Engineering KB\"}}",
+        "FTS_DB_PATH": "/home/hvksh/knowledgebase/data/corrosion_kb_fts.db",
+        "OLLAMA_URL": "http://localhost:11434",
+        "TEI_RERANK_URL": "http://localhost:8087"
+      },
+      "autoApprove": [
+        "search_corrosion_kb"
+      ]
+    }
+  }
+}

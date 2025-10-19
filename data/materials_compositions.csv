@@ -1,0 +1,19 @@
+common_name,UNS,Cr_wt_pct,Ni_wt_pct,Mo_wt_pct,N_wt_pct,density_kg_m3,grade_type,n_electrons,Fe_bal,source,notes
+304,S30400,18.0,8.0,0.0,0.1,8000.0,austenitic,2,True,ASTM A240,Austenitic stainless steel
+304L,S30403,18.0,9.0,0.0,0.1,8000.0,austenitic,2,True,ASTM A240,Austenitic stainless steel
+316,S31600,16.5,10.0,2.0,0.1,8000.0,austenitic,2,True,ASTM A240,Austenitic stainless steel
+316L,S31603,16.5,10.0,2.0,0.1,8000.0,austenitic,2,True,ASTM A240,Austenitic stainless steel
+317L,S31703,18.0,12.0,3.0,0.1,8000.0,austenitic,2,True,ASTM A240,Austenitic stainless steel
+904L,N08904,20.0,25.0,4.5,0.1,8000.0,superaustenitic,2,True,ASTM A240,Super austenitic stainless steel
+2205,S31803,22.0,5.5,3.0,0.17,7800.0,duplex,2,True,ASTM A240,Duplex stainless steel
+2507,S32750,25.0,7.0,4.0,0.27,7800.0,super_duplex,2,True,ASTM A240,Super duplex stainless steel
+254SMO,S31254,20.0,18.0,6.0,0.2,8000.0,superaustenitic,2,True,ASTM A240,Super austenitic stainless steel
+AL-6XN,N08367,20.5,24.0,6.3,0.22,8000.0,superaustenitic,2,True,ASTM A240,Super austenitic stainless steel
+Carbon Steel,K03005,0.0,0.0,0.0,0.0,7850.0,carbon_steel,2,True,ASTM A36,Carbon steel
+Inconel 625,N06625,21.5,61.0,9.0,0.0,8440.0,nickel_alloy,2,True,ASTM B443,Nickel-based alloy
+Incoloy 825,N08825,21.5,42.0,3.0,0.0,8140.0,nickel_alloy,2,True,ASTM B424,Nickel-based alloy
+Copper,C11000,0.0,0.0,0.0,0.0,8960.0,copper,1,False,ASTM B152,Copper or copper alloy
+90-10 CuNi,C70600,0.0,10.0,0.0,0.0,8940.0,copper_alloy,1,False,ASTM B171,Copper or copper alloy
+Aluminum,A91100,0.0,0.0,0.0,0.0,2700.0,aluminum,3,False,ASTM B209,Aluminum alloy
+Titanium Grade 2,R50400,0.0,0.0,0.0,0.0,4500.0,titanium,2,False,ASTM B265,Titanium alloy
+Zinc,Z19001,0.0,0.0,0.0,0.0,7140.0,zinc,2,False,ASTM B6,Zinc (sacrificial anode)

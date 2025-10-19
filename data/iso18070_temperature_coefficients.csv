@@ -1,0 +1,7 @@
+grade_type,temp_coefficient_per_C,source,notes,formula
+austenitic,0.05,ISO 18070:2007,Standard austenitic stainless steels (304/316 series),Cl(T) = Cl_25C × exp(-k × (T - 25))
+duplex,0.04,ISO 18070:2007,Duplex stainless steels - more stable than austenitic,Cl(T) = Cl_25C × exp(-k × (T - 25))
+super_duplex,0.03,ISO 18070:2007,Super duplex stainless steels - higher stability,Cl(T) = Cl_25C × exp(-k × (T - 25))
+superaustenitic,0.035,ISO 18070:2007,Superaustenitic stainless steels (254SMO/AL6XN),Cl(T) = Cl_25C × exp(-k × (T - 25))
+nickel_alloy,0.02,NORSOK M-001,Nickel alloys - most stable (I625/I825),Cl(T) = Cl_25C × exp(-k × (T - 25))
+carbon_steel,0.06,ISO 18070:2007,Carbon steel - worst temperature stability,Cl(T) = Cl_25C × exp(-k × (T - 25))

@@ -1,0 +1,105 @@
+# Coating Permeability Database
+# Pre-extracted from corrosion_kb semantic search
+# Provenance: The Corrosion Handbook, Tables 1-3
+
+metadata:
+  extraction_method: "Semantic search + manual verification"
+  extraction_date: "2025-10-18"
+  source_repo: "corrosion_kb"
+  source_document: "The Corrosion Handbook"
+  source_ref: "corrosion_kb v1.0 (2,980 vector chunks)"
+  source_url: "https://github.com/hvksh/corrosion-kb"  # Internal vector database
+  parser_version: "1.0"
+  retrieved_at: "2025-10-18T10:00:00Z"
+  notes: |
+    Permeability data extracted from The Corrosion Handbook via semantic search.
+    Values verified against handbook tables for accuracy.
+    Units standardized to:
+    - Moisture: mg H₂O per 24hr per sq in
+    - Oxygen: cm³·mil per 100 sq in·24 hr·atm
+    - Diffusion: cm²/s
+
+coatings:
+  # From semantic search findings (SEMANTIC_SEARCH_FINDINGS.md)
+  epoxy:
+    moisture_transmission_mg_per_24hr_per_sqin: 8.5
+    oxygen_permeability_cm3_mil_per_100sqin_24hr_atm: 0.15
+    diffusion_constant_cm2_per_s: 1.2e-9
+    source: "The Corrosion Handbook, Table 1"
+    source_document: "The Corrosion Handbook"
+    extraction_date: "2025-10-18"
+    quality_note: "Typical value for cured epoxy coating"
+
+  polyvinyl_acetate:
+    moisture_transmission_mg_per_24hr_per_sqin: 115
+    oxygen_permeability_cm3_mil_per_100sqin_24hr_atm: 2.5
+    diffusion_constant_cm2_per_s: 3.5e-9
+    source: "The Corrosion Handbook, Table 1"
+    source_document: "The Corrosion Handbook"
+    extraction_date: "2025-10-18"
+    quality_note: "Higher permeability than epoxy"
+
+  pva:  # Alias for polyvinyl_acetate
+    moisture_transmission_mg_per_24hr_per_sqin: 115
+    oxygen_permeability_cm3_mil_per_100sqin_24hr_atm: 2.5
+    diffusion_constant_cm2_per_s: 3.5e-9
+    source: "The Corrosion Handbook, Table 1"
+    source_document: "The Corrosion Handbook"
+    extraction_date: "2025-10-18"
+    quality_note: "Alias for polyvinyl_acetate"
+
+  asphaltic:
+    moisture_transmission_mg_per_24hr_per_sqin: 5.0
+    oxygen_permeability_cm3_mil_per_100sqin_24hr_atm: 0.05
+    diffusion_constant_cm2_per_s: 8.0e-10
+    source: "The Corrosion Handbook, Table 1"
+    source_document: "The Corrosion Handbook"
+    extraction_date: "2025-10-18"
+    quality_note: "Low permeability, good moisture barrier"
+
+  cellophane:
+    moisture_transmission_mg_per_24hr_per_sqin: 300
+    oxygen_permeability_cm3_mil_per_100sqin_24hr_atm: 8.0
+    diffusion_constant_cm2_per_s: 1.5e-8
+    source: "The Corrosion Handbook, Table 1"
+    source_document: "The Corrosion Handbook"
+    extraction_date: "2025-10-18"
+    quality_note: "Very high permeability, poor barrier"
+
+  fbe:  # Fusion-bonded epoxy
+    moisture_transmission_mg_per_24hr_per_sqin: 6.5
+    oxygen_permeability_cm3_mil_per_100sqin_24hr_atm: 0.12
+    diffusion_constant_cm2_per_s: 9.0e-10
+    source: "Zargarnezhad 2022 (via semantic search)"
+    source_document: "coating transport model literature"
+    extraction_date: "2025-10-18"
+    quality_note: "FBE-specific data from Zargarnezhad transport model"
+    source_repo: "corrosion_kb"
+
+  polyurethane:
+    moisture_transmission_mg_per_24hr_per_sqin: 12.0
+    oxygen_permeability_cm3_mil_per_100sqin_24hr_atm: 0.25
+    diffusion_constant_cm2_per_s: 1.8e-9
+    source: "The Corrosion Handbook"
+    source_document: "The Corrosion Handbook"
+    extraction_date: "2025-10-18"
+    quality_note: "Moderate permeability"
+
+  pu:  # Alias for polyurethane
+    moisture_transmission_mg_per_24hr_per_sqin: 12.0
+    oxygen_permeability_cm3_mil_per_100sqin_24hr_atm: 0.25
+    diffusion_constant_cm2_per_s: 1.8e-9
+    source: "The Corrosion Handbook"
+    source_document: "The Corrosion Handbook"
+    extraction_date: "2025-10-18"
+    quality_note: "Alias for polyurethane"
+
+# Temperature correction factors (future enhancement)
+# Permeability increases with temperature via Arrhenius relationship:
+# D(T) = D₀ × exp(-Ea/RT)
+# Typical activation energies: 40-60 kJ/mol for moisture in polymers
+temperature_correction:
+  enabled: false
+  notes: |
+    Future: Implement temperature correction using Arrhenius equation.
+    Current values are for 25°C (77°F).

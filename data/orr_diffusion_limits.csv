@@ -1,0 +1,6 @@
+condition,temperature_C,electrolyte,i_lim_A_m2,i_lim_mA_cm2,source,notes
+seawater_25C,25,seawater,5.0,0.5,NRL corrosion-modeling-applications,Saturated O₂ in seawater at 25°C
+seawater_40C,40,seawater,7.0,0.7,NRL corrosion-modeling-applications,Saturated O₂ in seawater at 40°C
+seawater_60C,60,seawater,10.0,1.0,NRL corrosion-modeling-applications,Saturated O₂ in seawater at 60°C
+freshwater_25C,25,freshwater,2.0,0.2,NRL corrosion-modeling-applications,Lower O₂ solubility in freshwater
+acid_25C,25,acid,3.0,0.3,NRL corrosion-modeling-applications,Acidic solution at 25°C

@@ -1,0 +1,12 @@
+material,UNS,CPT_C,CCT_C,test_solution,source,notes
+304,S30400,0,-10,6% FeCl3,ASTM G48-11,Austenitic stainless steel - low pitting resistance
+304L,S30403,0,-10,6% FeCl3,ASTM G48-11,Low carbon austenitic - low pitting resistance
+316,S31600,10,0,6% FeCl3,ASTM G48-11,Molybdenum austenitic - moderate pitting resistance
+316L,S31603,15,5,6% FeCl3,ASTM G48-11,Low carbon Mo austenitic - moderate pitting resistance
+317L,S31703,25,15,6% FeCl3,ASTM G48-11,High Mo austenitic - good pitting resistance
+2205,S32205,35,25,6% FeCl3,ASTM G48-11,Duplex stainless - excellent pitting resistance
+2507,S32750,50,40,6% FeCl3,ASTM G48-11,Super duplex - very high pitting resistance
+254SMO,S31254,50,40,6% FeCl3,ASTM G48-11,Superaustenitic - very high pitting resistance
+AL6XN,N08367,55,45,6% FeCl3,ASTM G48-11,Superaustenitic - extreme pitting resistance
+904L,N08904,45,35,6% FeCl3,ASTM G48-11,Superaustenitic - high pitting resistance
+I625,N06625,80,70,6% FeCl3,ASTM G48-11,Nickel alloy - exceptional pitting resistance

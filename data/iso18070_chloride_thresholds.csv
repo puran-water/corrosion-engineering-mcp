@@ -1,0 +1,13 @@
+material,UNS,threshold_25C_mg_L,pH,temperature_C,source,notes,resistance_category
+304,S30400,50,7.0,25,ISO 18070:2007,Low pitting resistance,low
+304L,S30403,50,7.0,25,ISO 18070:2007,Low pitting resistance,low
+316,S31600,200,7.0,25,ISO 18070:2007,Moderate pitting resistance,moderate
+316L,S31603,250,7.0,25,ISO 18070:2007,Moderate pitting resistance,moderate
+317L,S31703,500,7.0,25,ISO 18070:2007,Good pitting resistance,good
+2205,S31803,1000,7.0,25,ISO 18070:2007 / NORSOK M-001,Duplex - excellent resistance,excellent
+2507,S32750,2000,7.0,25,ISO 18070:2007 / NORSOK M-001,Super duplex - very high resistance,very_high
+254SMO,S31254,5000,7.0,25,ISO 18070:2007,Superaustenitic - extreme resistance,extreme
+AL6XN,N08367,6000,7.0,25,ISO 18070:2007,Superaustenitic - extreme resistance,extreme
+904L,N08904,4000,7.0,25,ISO 18070:2007,Superaustenitic - very high resistance,very_high
+I625,N06625,10000,7.0,25,NORSOK M-001,Nickel alloy - very high resistance,very_high
+I825,N08825,8000,7.0,25,NORSOK M-001,Nickel alloy - very high resistance,very_high

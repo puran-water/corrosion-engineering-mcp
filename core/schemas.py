@@ -13,7 +13,7 @@ Design Philosophy (from Codex review):
 """
 
 from typing import Any, Dict, List, Optional, Literal
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from enum import Enum
 
 
@@ -151,15 +151,17 @@ class CorrosionResult(BaseModel):
     # Provenance
     provenance: ProvenanceMetadata
 
-    @validator('rate_p95_mm_per_y')
-    def p95_greater_than_median(cls, v, values):
-        if 'rate_mm_per_y' in values and v < values['rate_mm_per_y']:
+    @field_validator('rate_p95_mm_per_y')
+    @classmethod
+    def p95_greater_than_median(cls, v, info):
+        if 'rate_mm_per_y' in info.data and v < info.data['rate_mm_per_y']:
             raise ValueError('rate_p95_mm_per_y must be >= rate_mm_per_y')
         return v
 
-    @validator('rate_p05_mm_per_y')
-    def p05_less_than_median(cls, v, values):
-        if 'rate_mm_per_y' in values and v > values['rate_mm_per_y']:
+    @field_validator('rate_p05_mm_per_y')
+    @classmethod
+    def p05_less_than_median(cls, v, info):
+        if 'rate_mm_per_y' in info.data and v > info.data['rate_mm_per_y']:
             raise ValueError('rate_p05_mm_per_y must be <= rate_mm_per_y')
         return v
 

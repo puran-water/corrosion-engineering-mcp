@@ -1,0 +1,119 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "corrosion-engineering-mcp"
+version = "0.3.0"
+description = "Physics-based corrosion rate prediction toolkit via Model Context Protocol"
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [
+    {name = "Puran Water", email = "info@puran.water"},
+]
+keywords = [
+    "corrosion",
+    "electrochemistry",
+    "materials-science",
+    "mcp",
+    "model-context-protocol",
+    "phreeqc",
+    "nrl",
+    "galvanic-corrosion",
+    "pitting",
+    "localized-corrosion",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+dependencies = [
+    "fastmcp>=0.1.0",
+    "numpy>=1.24.0",
+    "scipy>=1.10.0",
+    "pandas>=2.0.0",
+    "pydantic>=2.0.0",
+    "phreeqpython>=1.5.5",
+    "fluids>=1.2.0",
+    "ht>=1.0.0",
+    "requests>=2.31.0",
+    "requests-cache>=1.1.0",
+    "lxml>=4.9.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-mock>=3.14.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+
+phase2 = [
+    "pymatgen>=2023.0.0",
+    "impedance>=1.5.0",
+]
+
+phase3 = [
+    "PsychroLib>=2.5.0",
+    "matminer>=0.9.0",
+]
+
+phase4 = [
+    "SALib>=1.4.0",
+    "scikit-learn>=1.3.0",
+    "openpnm>=3.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/puran-water/corrosion-engineering-mcp"
+Documentation = "https://github.com/puran-water/corrosion-engineering-mcp#readme"
+Repository = "https://github.com/puran-water/corrosion-engineering-mcp"
+Issues = "https://github.com/puran-water/corrosion-engineering-mcp/issues"
+
+[tool.setuptools]
+packages = ["core", "tools", "utils", "data", "validation", "external"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--cov=core",
+    "--cov=tools",
+    "--cov=utils",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py312"]
+include = '\.pyi?$'
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+select = ["E", "F", "W", "I", "N", "UP"]
+ignore = ["E501"]  # Line too long (handled by black)
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false  # Gradually enable
+ignore_missing_imports = true

@@ -26,6 +26,8 @@ numpy>=1.24.0                 # Numerical arrays and mathematical operations
 scipy>=1.10.0                 # Scientific algorithms (integration, optimization)
 pandas>=2.0.0                 # Data manipulation and analysis
 pydantic>=2.0.0               # Data validation and settings management
+fluids>=1.2.0                 # Fluid mechanics utilities (Re, Sc, Sh calculations)
+ht>=1.0.0                     # Heat transfer correlations (Nu → Sh via analogy)
 
 # ----------------------------------------------------------------------------
 # Chemistry Engines (Phase 1+)

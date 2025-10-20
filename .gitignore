@@ -145,3 +145,17 @@ tmp*.json
 # Analysis files
 corrosion_analysis_*.json
 material_selection_*.json
+
+# Demo and diagnostic scripts (development only)
+demo_*.py
+diagnose_*.py
+
+# Progress documentation (session summaries, not production docs)
+*_SESSION_SUMMARY_*.md
+*_COMPLETE_*.md
+*_IMPLEMENTED_*.md
+POLARIZATION_CURVE_ROOT_CAUSE_*.md
+CODEX_REVIEW_FIXES_*.md
+CODEX_RECOMMENDATIONS_*.md
+NRL_HY80_COEFFICIENT_BUG_REPORT.md
+FINAL_SESSION_SUMMARY_*.md

@@ -118,20 +118,35 @@ class PittingResult:
     """
     Result of pitting corrosion susceptibility calculation.
 
-    Attributes:
+    Tier 1 (PREN/CPT - always available):
         CPT_C: Critical Pitting Temperature (°C)
         PREN: Pitting Resistance Equivalent Number
         Cl_threshold_mg_L: Chloride threshold at operating temperature (mg/L)
         susceptibility: "low", "moderate", "high", "critical"
         margin_C: Temperature margin to CPT (positive = safe, negative = unsafe)
         interpretation: Text summary
+
+    Tier 2 (Electrochemical E_pit vs E_mix - requires DO, NRL materials only):
+        E_pit_VSCE: Pitting initiation potential (V vs SCE), None if not calculated
+        E_mix_VSCE: Mixed/corrosion potential (V vs SCE), None if not calculated
+        electrochemical_margin_V: ΔE = E_mix - E_pit (V), None if not calculated
+        electrochemical_risk: "critical", "high", "moderate", "low", None if not calculated
+        electrochemical_interpretation: Text summary for Tier 2, None if not calculated
     """
+    # Tier 1: PREN/CPT (always present)
     CPT_C: float
     PREN: float
     Cl_threshold_mg_L: float
     susceptibility: str
     margin_C: float
     interpretation: str
+
+    # Tier 2: Electrochemical (optional, requires DO and NRL material)
+    E_pit_VSCE: Optional[float] = None
+    E_mix_VSCE: Optional[float] = None
+    electrochemical_margin_V: Optional[float] = None
+    electrochemical_risk: Optional[str] = None
+    electrochemical_interpretation: Optional[str] = None
 
 
 @dataclass
@@ -194,12 +209,17 @@ class LocalizedBackend:
         pH: float = 7.0,
         material_name: str = "316L",
         custom_cpt_correlation: Optional[Dict[str, float]] = None,
+        dissolved_oxygen_mg_L: Optional[float] = None,
     ) -> PittingResult:
         """
         Calculate pitting corrosion susceptibility.
 
         FIX BUG-013: Use ASTM G48 tabulated CPT data instead of heuristic
         FIX BUG-014: Use ISO 18070 chloride threshold data
+
+        PHASE 3 ENHANCEMENT: Dual-Tier pitting assessment
+        - Tier 1 (always): PREN/CPT empirical (fast, all materials)
+        - Tier 2 (optional): E_pit vs E_mix electrochemical (mechanistic, NRL materials only)
 
         Args:
             material_comp: Material composition (Cr, Mo, N)
@@ -208,9 +228,12 @@ class LocalizedBackend:
             pH: Solution pH
             material_name: Material name for database lookup
             custom_cpt_correlation: Optional custom CPT correlation (for calibration)
+            dissolved_oxygen_mg_L: Dissolved oxygen (mg/L). If provided and material
+                is in NRL database (HY80, HY100, SS316), calculates Tier 2
+                electrochemical pitting potential (E_pit vs E_mix).
 
         Returns:
-            PittingResult with CPT, PREN, threshold, susceptibility
+            PittingResult with Tier 1 CPT/PREN (always) and Tier 2 E_pit/E_mix (if DO provided)
         """
         # Calculate PREN using local method (handles local MaterialComposition format)
         pren = material_comp.calculate_pren()
@@ -263,13 +286,124 @@ class LocalizedBackend:
         else:
             interpretation = f"LOW RISK: T = {temperature_C}°C well below CPT = {CPT:.1f}°C (margin {margin_C:.1f}°C); Cl⁻ = {Cl_mg_L:.0f} mg/L < {Cl_threshold:.0f} mg/L"
 
+        # PHASE 3: Tier 2 Electrochemical Assessment (E_pit vs E_mix)
+        # Only if dissolved_oxygen_mg_L provided and material in NRL database
+        E_pit_VSCE = None
+        E_mix_VSCE = None
+        electrochemical_margin_V = None
+        electrochemical_risk = None
+        electrochemical_interpretation = None
+
+        if dissolved_oxygen_mg_L is not None:
+            # Check if material is in NRL database (HY80, HY100, SS316)
+            # Also support common aliases (316L, UNS codes)
+            nrl_materials = ["HY80", "HY100", "SS316"]
+
+            # Material alias mapping (per Codex recommendation)
+            material_aliases = {
+                "316L": "SS316",
+                "316": "SS316",
+                "UNS S31600": "SS316",
+                "UNS S31603": "SS316",  # 316L UNS
+                "HY-80": "HY80",
+                "HY-100": "HY100",
+            }
+
+            material_upper = material_name.upper()
+            # Map alias to canonical NRL name
+            material_nrl = material_aliases.get(material_upper, material_upper)
+
+            if material_nrl in nrl_materials:
+                try:
+                    # Import Tier 2 modules
+                    from utils.pitting_assessment import (
+                        calculate_pitting_potential,
+                        assess_pitting_risk_electrochemical,
+                    )
+                    from utils.redox_state import do_to_eh
+                    from utils.nrl_constants import C
+
+                    # Calculate E_pit using NRL Butler-Volmer pitting kinetics
+                    E_pit_VSCE, pit_details = calculate_pitting_potential(
+                        material_name=material_nrl,  # Use canonical NRL name
+                        temperature_C=temperature_C,
+                        chloride_mg_L=Cl_mg_L,
+                        pH=pH,
+                        i_threshold_A_cm2=1e-6,  # 1 µA/cm² threshold
+                    )
+
+                    # Calculate E_mix from DO using RedoxState
+                    Eh_VSHE, redox_warnings = do_to_eh(
+                        dissolved_oxygen_mg_L=dissolved_oxygen_mg_L,
+                        pH=pH,
+                        temperature_C=temperature_C,
+                    )
+                    # Convert SHE to SCE: E_SCE = E_SHE - 0.241 V
+                    E_mix_VSCE = Eh_VSHE - C.E_SHE_to_SCE
+
+                    # Assess electrochemical pitting risk
+                    electrochemical_risk, electrochemical_interpretation, electrochemical_margin_V = (
+                        assess_pitting_risk_electrochemical(E_mix_VSCE, E_pit_VSCE)
+                    )
+
+                    # Append RedoxState warnings to interpretation (per Codex recommendation)
+                    if redox_warnings:
+                        electrochemical_interpretation += f" [RedoxState: {redox_warnings[0]}]"
+
+                    logger.info(
+                        f"Tier 2 electrochemical pitting assessment for {material_name}: "
+                        f"E_pit = {E_pit_VSCE:.3f} V_SCE, E_mix = {E_mix_VSCE:.3f} V_SCE, "
+                        f"dE = {electrochemical_margin_V*1000:.0f} mV, Risk = {electrochemical_risk.upper()}"
+                    )
+
+                except ValueError as e:
+                    # Activation energy out of range (e.g., HY80 at seawater)
+                    logger.warning(
+                        f"Tier 2 electrochemical assessment failed for {material_name}: {str(e)}\n"
+                        f"Falling back to Tier 1 PREN/CPT only."
+                    )
+                    # Per Codex: Add explanation to electrochemical_interpretation
+                    electrochemical_interpretation = (
+                        f"Tier 2 unavailable: NRL coefficients out of valid range at "
+                        f"(Cl={Cl_mg_L:.0f} mg/L, T={temperature_C:.0f}°C, pH={pH:.1f}). "
+                        f"Use Tier 1 PREN/CPT assessment only."
+                    )
+                except Exception as e:
+                    logger.error(
+                        f"Unexpected error in Tier 2 electrochemical assessment for {material_name}: {str(e)}\n"
+                        f"Falling back to Tier 1 PREN/CPT only."
+                    )
+                    # Per Codex: Add explanation to electrochemical_interpretation
+                    electrochemical_interpretation = (
+                        f"Tier 2 unavailable: Unexpected error during calculation. "
+                        f"Use Tier 1 PREN/CPT assessment only."
+                    )
+            else:
+                # Per Codex: Add explanation when material not in NRL database
+                logger.info(
+                    f"Material '{material_name}' not in NRL database (HY80, HY100, SS316). "
+                    f"Tier 2 electrochemical assessment not available. Using Tier 1 PREN/CPT only."
+                )
+                electrochemical_interpretation = (
+                    f"Tier 2 unavailable: Material '{material_name}' not in NRL database "
+                    f"(supported: HY80, HY100, SS316, and aliases 316/316L/UNS S31600). "
+                    f"Use Tier 1 PREN/CPT assessment only."
+                )
+
         return PittingResult(
+            # Tier 1: PREN/CPT (always present)
             CPT_C=CPT,
             PREN=pren,
             Cl_threshold_mg_L=Cl_threshold,
             susceptibility=susceptibility,
             margin_C=margin_C,
             interpretation=interpretation,
+            # Tier 2: Electrochemical (optional)
+            E_pit_VSCE=E_pit_VSCE,
+            E_mix_VSCE=E_mix_VSCE,
+            electrochemical_margin_V=electrochemical_margin_V,
+            electrochemical_risk=electrochemical_risk,
+            electrochemical_interpretation=electrochemical_interpretation,
         )
 
     def calculate_crevice_susceptibility(
@@ -386,6 +520,7 @@ class LocalizedBackend:
         Cl_mg_L: float,
         pH: float = 7.0,
         crevice_gap_mm: float = 0.1,
+        dissolved_oxygen_mg_L: Optional[float] = None,
     ) -> LocalizedResult:
         """
         Calculate combined pitting and crevice susceptibility.
@@ -396,18 +531,23 @@ class LocalizedBackend:
             Cl_mg_L: Chloride concentration (mg/L)
             pH: Solution pH
             crevice_gap_mm: Crevice gap width (mm)
+            dissolved_oxygen_mg_L: Dissolved oxygen (mg/L). If provided, enables
+                Tier 2 electrochemical pitting assessment for NRL materials.
 
         Returns:
             LocalizedResult with separate pitting and crevice results
 
         Per Codex: Separate pitting vs crevice outputs, shared Cl⁻ threshold logic
+        Phase 3: Dual-Tier pitting (Tier 1 PREN/CPT + optional Tier 2 E_pit/E_mix)
         """
         # Get material composition from database
         material_comp = self._get_material_composition(material)
 
-        # Calculate pitting susceptibility
+        # Calculate pitting susceptibility (Tier 1 + optional Tier 2)
         pitting_result = self.calculate_pitting_susceptibility(
-            material_comp, temperature_C, Cl_mg_L, pH, material_name=material
+            material_comp, temperature_C, Cl_mg_L, pH,
+            material_name=material,
+            dissolved_oxygen_mg_L=dissolved_oxygen_mg_L,
         )
 
         # Calculate crevice susceptibility

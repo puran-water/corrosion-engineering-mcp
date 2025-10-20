@@ -312,15 +312,20 @@ def material_screening_query(
     """
     lookup = MaterialScreeningLookup(mcp_search_function)
 
-    # For multi-material screening, run separate queries and return best match
-    # For now, query for first candidate
-    material = candidates[0] if candidates else "carbon steel"
+    # Screen all candidates and return results for best/most compatible option
+    # For now, combine all candidates in a single query to get comprehensive coverage
+    materials_str = ", ".join(candidates) if candidates else "carbon steel"
 
-    query_text = f"{material} corrosion in {environment}"
+    query_text = f"{materials_str} corrosion in {environment}"
     if application:
         query_text += f" for {application} application"
 
     result_dict = lookup.query(query_text)
+
+    # Override material field to show all candidates screened
+    if candidates:
+        result_dict["material"] = materials_str
+        result_dict["environment"] = f"{materials_str} corrosion in {environment}"
 
     # Convert to Pydantic model
     return MaterialCompatibility(**result_dict)

@@ -29,12 +29,57 @@ Per Codex guidance:
 - Simplified Oldfield-Sutton IR drop
 """
 
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 import logging
 
 from core.localized_backend import LocalizedBackend, MaterialComposition
 
 logger = logging.getLogger(__name__)
+
+
+def _detect_tier_disagreement(
+    tier1_susceptibility: str,
+    tier2_risk: Optional[str],
+) -> Tuple[bool, Optional[str]]:
+    """
+    Detect when Tier 1 (PREN/CPT) and Tier 2 (E_pit vs E_mix) give different risk assessments.
+
+    Per Codex recommendation: Expose conflicts explicitly with guidance.
+
+    Args:
+        tier1_susceptibility: "low", "moderate", "high", "critical"
+        tier2_risk: "low", "moderate", "high", "critical", or None (if Tier 2 unavailable)
+
+    Returns:
+        (disagreement_detected: bool, explanation: str or None)
+
+    Example:
+        >>> disagreement, msg = _detect_tier_disagreement("critical", "low")
+        >>> print(disagreement)  # True
+        >>> print(msg)
+        "Tier 1 (PREN/CPT) says 'critical' but Tier 2 (E_pit vs E_mix) says 'low'. ..."
+    """
+    if tier2_risk is None:
+        return (False, None)  # No disagreement if Tier 2 unavailable
+
+    # Risk severity ranking (for comparison)
+    risk_levels = {"low": 0, "moderate": 1, "high": 2, "critical": 3}
+
+    tier1_level = risk_levels.get(tier1_susceptibility.lower(), -1)
+    tier2_level = risk_levels.get(tier2_risk.lower(), -1)
+
+    # Disagreement = difference of 2+ levels (e.g., "critical" vs "low")
+    if abs(tier1_level - tier2_level) >= 2:
+        explanation = (
+            f"⚠️ TIER DISAGREEMENT: Tier 1 (PREN/CPT empirical) says '{tier1_susceptibility}' "
+            f"but Tier 2 (E_pit vs E_mix mechanistic) says '{tier2_risk}'. "
+            f"Recommendation: Trust Tier 2 for accurate assessment - it accounts for actual "
+            f"electrochemical driving force and redox conditions. Tier 1 CPT is a conservative "
+            f"screening tool (worst-case ferric chloride test, does not account for dissolved oxygen)."
+        )
+        return (True, explanation)
+
+    return (False, None)
 
 
 def calculate_localized_corrosion(
@@ -44,6 +89,7 @@ def calculate_localized_corrosion(
     pH: float = 7.0,
     crevice_gap_mm: float = 0.1,
     water_chemistry_json: Optional[str] = None,
+    dissolved_oxygen_mg_L: Optional[float] = None,
 ) -> Dict:
     """
     Calculate pitting and crevice corrosion susceptibility.
@@ -55,16 +101,26 @@ def calculate_localized_corrosion(
         pH: Solution pH (default 7.0)
         crevice_gap_mm: Crevice gap width in mm (default 0.1 mm)
         water_chemistry_json: Optional JSON with full water chemistry for PHREEQC integration
+        dissolved_oxygen_mg_L: Dissolved oxygen concentration (mg/L). If provided,
+            enables Tier 2 electrochemical pitting assessment (E_pit vs E_mix) for
+            NRL materials (HY80, HY100, SS316). Tier 1 PREN/CPT always calculated.
 
     Returns:
         Dictionary containing:
-        - pitting: Pitting susceptibility results
+        - pitting: Pitting susceptibility results (Tier 1 + optional Tier 2)
+            Tier 1 (PREN/CPT - always present):
             - CPT_C: Critical Pitting Temperature (°C)
             - PREN: Pitting Resistance Equivalent Number
             - Cl_threshold_mg_L: Chloride threshold (mg/L)
             - susceptibility: "low", "moderate", "high", "critical"
             - margin_C: Temperature margin to CPT (°C)
             - interpretation: Text summary
+            Tier 2 (Electrochemical - if DO provided and NRL material):
+            - E_pit_VSCE: Pitting initiation potential (V vs SCE), None if not calculated
+            - E_mix_VSCE: Mixed/corrosion potential (V vs SCE), None if not calculated
+            - electrochemical_margin_V: ΔE = E_mix - E_pit (V), None if not calculated
+            - electrochemical_risk: "critical", "high", "moderate", "low", None if not calculated
+            - electrochemical_interpretation: Text summary for Tier 2, None if not calculated
         - crevice: Crevice susceptibility results
             - CCT_C: Critical Crevice Temperature (°C)
             - IR_drop_V: IR drop in crevice (V)
@@ -131,17 +187,25 @@ def calculate_localized_corrosion(
         Cl_mg_L=Cl_mg_L,
         pH=pH,
         crevice_gap_mm=crevice_gap_mm,
+        dissolved_oxygen_mg_L=dissolved_oxygen_mg_L,
     )
 
     # Format output
     output = {
         "pitting": {
+            # Tier 1 (PREN/CPT - always present)
             "CPT_C": round(result.pitting.CPT_C, 1),
             "PREN": round(result.pitting.PREN, 1),
             "Cl_threshold_mg_L": round(result.pitting.Cl_threshold_mg_L, 1),
             "susceptibility": result.pitting.susceptibility,
             "margin_C": round(result.pitting.margin_C, 1),
             "interpretation": result.pitting.interpretation,
+            # Tier 2 (Electrochemical - optional, requires DO and NRL material)
+            "E_pit_VSCE": round(result.pitting.E_pit_VSCE, 3) if result.pitting.E_pit_VSCE is not None else None,
+            "E_mix_VSCE": round(result.pitting.E_mix_VSCE, 3) if result.pitting.E_mix_VSCE is not None else None,
+            "electrochemical_margin_V": round(result.pitting.electrochemical_margin_V, 3) if result.pitting.electrochemical_margin_V is not None else None,
+            "electrochemical_risk": result.pitting.electrochemical_risk,
+            "electrochemical_interpretation": result.pitting.electrochemical_interpretation,
         },
         "crevice": {
             "CCT_C": round(result.crevice.CCT_C, 1),
@@ -243,6 +307,25 @@ def calculate_localized_corrosion(
     # Add note about water chemistry integration (future)
     if water_chemistry_json:
         output["note"] = "Water chemistry integration with PHREEQC pending (Phase 2 enhancement)"
+
+    # Detect Tier 1 vs Tier 2 disagreement (per Codex recommendation)
+    disagreement_detected, disagreement_msg = _detect_tier_disagreement(
+        tier1_susceptibility=result.pitting.susceptibility,
+        tier2_risk=result.pitting.electrochemical_risk,
+    )
+    if disagreement_detected:
+        output["tier_disagreement"] = {
+            "detected": True,
+            "tier1_assessment": result.pitting.susceptibility,
+            "tier2_assessment": result.pitting.electrochemical_risk,
+            "explanation": disagreement_msg,
+        }
+        # Also prepend to recommendations for visibility
+        recommendations.insert(0, disagreement_msg)
+    else:
+        output["tier_disagreement"] = {
+            "detected": False,
+        }
 
     return output
 

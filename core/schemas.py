@@ -244,6 +244,107 @@ class PittingScreenResult(BaseModel):
 
 
 # ============================================================================
+# Phase 2: Advanced Mechanistic Results
+# ============================================================================
+
+class GalvanicCorrosionResult(BaseModel):
+    """
+    NRL Butler-Volmer mixed potential galvanic corrosion prediction.
+
+    Phase 2 tool output with full electrochemical details.
+    """
+    anode_material: str = Field(..., description="Anode material identifier")
+    cathode_material: str = Field(..., description="Cathode material identifier")
+
+    # Electrochemical results
+    mixed_potential_VSCE: float = Field(..., description="Mixed potential vs SCE (V)")
+    galvanic_current_density_A_cm2: float = Field(..., description="Galvanic current density (A/cm²)")
+
+    # Corrosion rate predictions
+    anode_corrosion_rate_mm_year: float = Field(..., description="Anode corrosion rate (mm/year)", ge=0)
+    anode_corrosion_rate_mpy: float = Field(..., description="Anode corrosion rate (mils/year)", ge=0)
+
+    # Severity metrics
+    current_ratio: float = Field(..., description="Galvanic/isolated current ratio (dimensionless)", ge=0)
+    severity_assessment: str = Field(..., description="Qualitative severity (e.g., 'Severe', 'Moderate', 'Negligible')")
+
+    # Geometry
+    area_ratio_cathode_to_anode: float = Field(..., description="Cathode/anode area ratio")
+
+    # Environment summary
+    environment: Dict[str, float] = Field(..., description="Environmental conditions (pH, T, Cl⁻, etc.)")
+
+    # Warnings and recommendations
+    warnings: List[str] = Field(default_factory=list, description="Engineering warnings")
+    recommendations: List[str] = Field(default_factory=list, description="Mitigation recommendations")
+
+    # Provenance
+    provenance: ProvenanceMetadata
+
+
+class PourbaixDiagramResult(BaseModel):
+    """
+    Pourbaix (E-pH) stability diagram for material selection.
+
+    Phase 2 tool output with thermodynamic regions and boundaries.
+    """
+    element: str = Field(..., description="Element analyzed (Fe, Cr, Ni, Cu, Ti, Al)")
+    temperature_C: float = Field(..., description="Temperature (°C)")
+    soluble_concentration_M: float = Field(..., description="Solubility limit for corrosion threshold (mol/L)")
+
+    # Regions (immunity, passivation, corrosion)
+    regions: Dict[str, List[tuple]] = Field(..., description="Stability regions {region_name: [(pH, E), ...]}")
+
+    # Boundaries between regions
+    boundaries: List[Dict[str, Any]] = Field(..., description="Phase boundary definitions")
+
+    # Water stability lines
+    water_lines: Dict[str, List[tuple]] = Field(..., description="H2/O2 evolution lines {line_name: [(pH, E), ...]}")
+
+    # Grid metadata
+    pH_range: tuple[float, float] = Field(..., description="pH range (min, max)")
+    E_range_VSHE: tuple[float, float] = Field(..., description="Potential range vs SHE (V)")
+    grid_points: int = Field(..., description="Number of grid points")
+
+    # Stability assessment at specific point (if requested)
+    point_assessment: Optional[Dict[str, Any]] = Field(None, description="Stability at specific (pH, E) point")
+
+    # Provenance
+    provenance: ProvenanceMetadata
+
+
+class MaterialPropertiesResult(BaseModel):
+    """
+    Material electrochemical properties database lookup.
+
+    Phase 2 tool output for alloy characterization.
+    """
+    material: str = Field(..., description="Material identifier (HY80, SS316, etc.)")
+
+    # Composition
+    composition: str = Field(..., description="Nominal composition (e.g., 'Fe-16Cr-10Ni-2Mo')")
+    uns_number: Optional[str] = Field(None, description="UNS designation (e.g., 'S31600')")
+
+    # Electrochemical behavior
+    passivation_behavior: str = Field(..., description="Passivation characteristics")
+    galvanic_series_position: str = Field(..., description="Position in galvanic series (e.g., 'Noble', 'Active')")
+
+    # Material-specific notes
+    pitting_resistance: Optional[str] = Field(None, description="Pitting resistance notes (PREN, CPT)")
+    wastewater_notes: Optional[str] = Field(None, description="Wastewater-specific guidance")
+
+    # Physical properties
+    density_g_cm3: Optional[float] = Field(None, description="Density (g/cm³)")
+    equivalent_weight: Optional[float] = Field(None, description="Electrochemical equivalent weight (g/mol)")
+
+    # Supported reactions
+    supported_reactions: List[str] = Field(default_factory=list, description="Available electrochemical reactions")
+
+    # Provenance
+    provenance: ProvenanceMetadata
+
+
+# ============================================================================
 # Tier 3: Uncertainty Quantification Results
 # ============================================================================
 

@@ -82,10 +82,11 @@ def predict_galvanic_corrosion(
         Dictionary with results:
         {
             "mixed_potential_VSCE": float,  # Galvanic couple potential
-            "galvanic_current_density_A_cm2": float,  # Current density at anode
+            "galvanic_current_density_A_cm2": float,  # Anodic dissolution current density
+            "galvanic_net_current_density_A_cm2": float,  # Net current (anodic + cathodic) on anode
             "anode_corrosion_rate_mm_year": float,  # Penetration rate
             "cathode_corrosion_rate_mm_year": float,  # Usually near zero
-            "current_ratio": float,  # i_galvanic / i_isolated_anode
+            "current_ratio": float,  # i_anodic_galvanic / i_anodic_isolated
             "warnings": List[str],  # Validation warnings
             "polarization_curves": {  # Full curves for plotting
                 "anode": {...},
@@ -220,7 +221,8 @@ def predict_galvanic_corrosion(
 
         return {
             "mixed_potential_VSCE": E_corr_isolated,
-            "galvanic_current_density_A_cm2": abs(i_corr_isolated),
+            "galvanic_current_density_A_cm2": abs(i_corr_anodic),
+            "galvanic_net_current_density_A_cm2": abs(i_corr_isolated),
             "anode_corrosion_rate_mm_year": anode_CR_mm_year,
             "anode_corrosion_rate_mpy": anode_CR_mpy,
             "cathode_corrosion_rate_mm_year": 0.0,
@@ -273,7 +275,7 @@ def predict_galvanic_corrosion(
 
     # Find mixed potential (galvanic couple potential)
     try:
-        E_galvanic, i_galvanic, convergence_info = _find_mixed_potential(
+        E_galvanic, i_galvanic_net, convergence_info = _find_mixed_potential(
             e_applied_VSCE,
             anode_curves,
             cathode_curves,
@@ -284,11 +286,18 @@ def predict_galvanic_corrosion(
             f"Failed to find mixed potential for {anode_material}/{cathode_material} couple: {e}"
         )
 
+    # Interpolate galvanic anodic current directly from the anodic branch
+    i_galvanic_anodic = np.interp(
+        E_galvanic,
+        anode_curves["potential_VSCE"],
+        anode_curves["anodic_current_A_cm2"]
+    )
+
     # Calculate corrosion rates
     # CRITICAL FIX (Codex): Use material-specific density
     anode_density = _get_material_density(anode_material)
     anode_CR_mm_year = _current_to_corrosion_rate(
-        abs(i_galvanic),
+        abs(i_galvanic_anodic),
         anode.metal_mass,
         anode.oxidation_level_z,
         density_g_cm3=anode_density
@@ -309,7 +318,7 @@ def predict_galvanic_corrosion(
             "polarization curves that don't intersect properly."
         )
 
-    # Current ratio: i_galvanic / i_isolated
+    # Current ratio: i_anodic_galvanic / i_anodic_isolated
     # CRITICAL FIX (Codex): Use anodic current magnitude, NOT total current (which is zero at E_corr)
     # Total current is identically zero at corrosion potential by definition,
     # so we must use the anodic branch magnitude to quantify galvanic amplification
@@ -329,7 +338,7 @@ def predict_galvanic_corrosion(
             f"This typically indicates passive or nearly identical materials."
         )
     else:
-        current_ratio = abs(i_galvanic) / abs(i_isolated_anodic)
+        current_ratio = abs(i_galvanic_anodic) / abs(i_isolated_anodic)
 
     # Add warnings based on current ratio
     if current_ratio > 10.0:
@@ -356,7 +365,8 @@ def predict_galvanic_corrosion(
 
     return {
         "mixed_potential_VSCE": E_galvanic,
-        "galvanic_current_density_A_cm2": abs(i_galvanic),
+        "galvanic_current_density_A_cm2": abs(i_galvanic_anodic),
+        "galvanic_net_current_density_A_cm2": abs(i_galvanic_net),
         "anode_corrosion_rate_mm_year": anode_CR_mm_year,
         "anode_corrosion_rate_mpy": anode_CR_mpy,
         "cathode_corrosion_rate_mm_year": cathode_CR_mm_year,

@@ -271,23 +271,30 @@ class CorrodingMetal:
 
         ΔG(T, Cl⁻) = p00 + p10*Cl⁻ + p01*T + p20*Cl⁻² + p11*Cl⁻*T + p02*T²
 
+        CRITICAL: NRL polynomials expect temperature in KELVIN, not Celsius.
+        The MATLAB reference uses Kelvin throughout (ElectrochemicalReductionReaction.m:69-108).
+        Failing to convert causes large negative activation energies for HY80.
+
         Args:
             coeffs: Array of [p00, p10, p01, p20, p11, p02]
             chloride_M: Chloride concentration, M
-            temperature_C: Temperature, °C
+            temperature_C: Temperature, °C (will be converted to Kelvin internally)
 
         Returns:
             Activation energy without pH correction, J/mol
         """
         p00, p10, p01, p20, p11, p02 = coeffs
 
+        # Convert Celsius to Kelvin (CRITICAL FIX per Codex investigation)
+        temperature_K = temperature_C + 273.15
+
         delta_g_no_pH = (
             p00 +
             p10 * chloride_M +
-            p01 * temperature_C +
+            p01 * temperature_K +  # Use Kelvin, not Celsius
             p20 * chloride_M**2 +
-            p11 * chloride_M * temperature_C +
-            p02 * temperature_C**2
+            p11 * chloride_M * temperature_K +  # Use Kelvin, not Celsius
+            p02 * temperature_K**2  # Use Kelvin, not Celsius
         )
 
         return delta_g_no_pH

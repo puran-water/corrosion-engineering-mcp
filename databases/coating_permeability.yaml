@@ -8,7 +8,7 @@ metadata:
   source_repo: "corrosion_kb"
   source_document: "The Corrosion Handbook"
   source_ref: "corrosion_kb v1.0 (2,980 vector chunks)"
-  source_url: "https://github.com/hvksh/corrosion-kb"  # Internal vector database
+  source_url: "Puran Water internal vector database"
   parser_version: "1.0"
   retrieved_at: "2025-10-18T10:00:00Z"
   notes: |

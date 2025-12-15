@@ -1,0 +1,19 @@
+# Include documentation
+include README.md
+include LICENSE
+
+# Include all data files
+# Note: NRL coefficients consolidated to external/nrl_coefficients/
+recursive-include data *.csv *.yaml *.yml
+recursive-include external *.csv *.md *.xml
+recursive-include databases *.yaml *.yml
+
+# Include type stubs if any
+recursive-include . *.pyi
+
+# Exclude test files and caches from distribution
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude .git*
+prune tests
+prune docs

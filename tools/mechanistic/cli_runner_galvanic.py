@@ -65,15 +65,15 @@ def main():
                 pol_curves['potential_VSCE'] = downsample_array(pol_curves['potential_VSCE'], target_points)
 
                 # Downsample corresponding current arrays
-                if 'anode' in pol_curves and 'current_density_A_cm2' in pol_curves['anode']:
-                    pol_curves['anode']['current_density_A_cm2'] = downsample_array(
-                        pol_curves['anode']['current_density_A_cm2'], target_points
-                    )
-
-                if 'cathode' in pol_curves and 'current_density_A_cm2' in pol_curves['cathode']:
-                    pol_curves['cathode']['current_density_A_cm2'] = downsample_array(
-                        pol_curves['cathode']['current_density_A_cm2'], target_points
-                    )
+                # FIXED: Schema uses total_current, anodic_current, cathodic_current
+                # (not current_density_A_cm2)
+                for electrode in ['anode', 'cathode']:
+                    if electrode in pol_curves:
+                        for current_key in ['total_current', 'anodic_current', 'cathodic_current']:
+                            if current_key in pol_curves[electrode]:
+                                pol_curves[electrode][current_key] = downsample_array(
+                                    pol_curves[electrode][current_key], target_points
+                                )
 
         # Write result to stdout as JSON
         json.dump(result, sys.stdout)

@@ -672,7 +672,7 @@ def _current_to_corrosion_rate(
     where:
     - i = current density, A/cm²
     - M = molar mass, g/mol
-    - K = 3.27e6 (conversion factor: cm/s → mm/year)
+    - K = 3.15576e8 (conversion factor: cm/s → mm/year)
     - n = electrons transferred
     - F = Faraday constant, C/mol
     - ρ = density, g/cm³
@@ -686,7 +686,10 @@ def _current_to_corrosion_rate(
     Returns:
         Corrosion rate, mm/year
     """
-    K = 3.27e6  # Conversion factor: (365.25 * 24 * 3600 * 10) for cm/s → mm/year
+    # FIXED: Previous value 3.27e6 was ~96.5× too small (typo in original)
+    # Correct: 365.25 * 24 * 3600 = 31,557,600 s/year; multiply by 10 for cm→mm
+    SECONDS_PER_YEAR = 365.25 * 24 * 3600  # 31,557,600 s/year
+    K = SECONDS_PER_YEAR * 10.0  # 3.15576e8: converts cm/s → mm/year
 
     CR_mm_year = (
         current_density_A_cm2 * molar_mass_g_mol * K /

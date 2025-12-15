@@ -31,7 +31,8 @@ import math
 
 # Location of NRL CSV files - DIRECT IMPORT from authoritative source
 # Local copy from: https://github.com/USNavalResearchLaboratory/corrosion-modeling-applications
-NRL_DATA_DIR = Path(__file__).parent / "nrl_csv_files"
+# Consolidated to external/nrl_coefficients/ as canonical location
+NRL_DATA_DIR = Path(__file__).parent.parent / "external" / "nrl_coefficients"
 
 # Physical constants from NRL Constants.m
 R_GAS = 8.314  # Ideal gas constant, J/(mol·K)

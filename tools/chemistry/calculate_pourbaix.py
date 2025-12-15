@@ -187,6 +187,13 @@ def calculate_pourbaix(
     if not (-3.0 <= E_range_VSHE[0] < E_range_VSHE[1] <= 3.0):
         raise ValueError(f"Invalid potential range: {E_range_VSHE}")
 
+    # Cap grid_points to prevent runaway computation (DoS protection)
+    MAX_GRID_POINTS = 200
+    warnings = []
+    if grid_points > MAX_GRID_POINTS:
+        warnings.append(f"grid_points clamped from {grid_points} to {MAX_GRID_POINTS}")
+        grid_points = MAX_GRID_POINTS
+
     # Generate pH and E grids
     pH_grid = np.linspace(pH_range[0], pH_range[1], grid_points)
     E_grid = np.linspace(E_range_VSHE[0], E_range_VSHE[1], grid_points)
@@ -222,7 +229,8 @@ def calculate_pourbaix(
         "regions": regions,
         "boundaries": boundaries,
         "water_lines": water_lines,
-        "grid_points": grid_points
+        "grid_points": grid_points,
+        "warnings": warnings,  # Any input adjustments (e.g., grid_points clamped)
     }
 
 

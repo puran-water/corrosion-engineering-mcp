@@ -24,8 +24,11 @@ Author: Dung Nguyen (original), Vendored for corrosion-engineering-mcp
 """
 
 import sys
+import logging
 from pathlib import Path
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 # Add vendored NORSOK module to path
 EXTERNAL_DIR = Path(__file__).parent.parent / "external" / "norsokm506"
@@ -60,10 +63,15 @@ def get_ph_correction_factor(temperature_C: float, pH: float) -> float:
 
     Args:
         temperature_C: Temperature in °C (range: 5-150°C)
-        pH: pH value (range: 3.5-6.5)
+        pH: pH value (range: 3.5-6.5, clamped with warning if outside)
 
     Returns:
         pH correction factor (dimensionless)
+
+    Note:
+        pH values outside 3.5-6.5 are clamped to the nearest bound with a warning,
+        rather than raising ValueError. This allows upstream chemistry (e.g., PHREEQC)
+        that produces out-of-range pH to still work with the NORSOK model.
 
     Example:
         >>> get_ph_correction_factor(25.0, 5.0)
@@ -78,10 +86,18 @@ def get_ph_correction_factor(temperature_C: float, pH: float) -> float:
             f"Temperature {temperature_C}°C out of NORSOK M-506 range (5-150°C)"
         )
 
-    if not (3.5 <= pH <= 6.5):
-        raise ValueError(
-            f"pH {pH} out of NORSOK M-506 range (3.5-6.5)"
+    # Clamp pH to valid NORSOK range with warning (instead of raising)
+    # This allows upstream chemistry that produces out-of-range pH to still work
+    if pH < 3.5:
+        logger.warning(
+            f"pH {pH:.2f} below NORSOK M-506 minimum (3.5), clamping to 3.5"
         )
+        pH = 3.5
+    elif pH > 6.5:
+        logger.warning(
+            f"pH {pH:.2f} above NORSOK M-506 maximum (6.5), clamping to 6.5"
+        )
+        pH = 6.5
 
     return fpH_Cal(temperature_C, pH)
 

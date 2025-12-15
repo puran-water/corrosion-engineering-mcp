@@ -151,6 +151,29 @@ def predict_co2_h2s_corrosion(
     if pH is not None and not (3.5 <= pH <= 6.5):
         logger.warning(f"pH {pH} outside NORSOK M-506 validated range (3.5-6.5)")
 
+    # Short-circuit: Zero CO₂ means zero CO₂ corrosion (no need for NORSOK pH lookup)
+    if co2_fraction == 0.0:
+        logger.info("CO₂ fraction is zero - returning zero corrosion rate")
+        return {
+            "corrosion_rate_mm_y": 0.0,
+            "corrosion_rate_mpy": 0.0,
+            "pH_calculated": pH if pH is not None else 7.0,  # Neutral default
+            "co2_partial_pressure_bar": 0.0,
+            "h2s_partial_pressure_bar": h2s_fraction * pressure_bar,
+            "mechanism": "none",
+            "severity": "negligible",
+            "interpretation": "No CO₂ corrosion: CO₂ fraction is zero",
+            "provenance": {
+                "model": "NORSOK M-506 (short-circuit)",
+                "version": "Rev. 3 (2017)",
+                "tool_tier": 2,
+                "standards": ["NORSOK M-506:2017"],
+                "confidence": "high",
+                "assumptions": ["Zero CO₂ fraction implies zero CO₂ corrosion"],
+                "warnings": [],
+            },
+        }
+
     # Calculate partial pressures
     co2_partial_pressure_bar = co2_fraction * pressure_bar
     h2s_partial_pressure_bar = h2s_fraction * pressure_bar

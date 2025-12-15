@@ -155,10 +155,16 @@ def predict_aerated_chloride_corrosion(
         logger.warning(f"Material '{material}' not recognized, treating as carbon_steel")
         material = "carbon_steel"
 
+    # Track provenance BEFORE potentially overwriting dissolved_oxygen_mg_L
+    # FIXED: Previously, provenance check was after overwrite, so always reported "User-supplied"
+    do_was_user_supplied = dissolved_oxygen_mg_L is not None
+
+    # Calculate salinity for all cases (needed for DO saturation calculation)
+    salinity_psu = estimate_salinity_from_chloride(chloride_mg_L)
+
     # Calculate or use supplied DO concentration
     if dissolved_oxygen_mg_L is None:
         # Calculate DO saturation using Weiss (1970) / Garcia-Benson (1992)
-        salinity_psu = estimate_salinity_from_chloride(chloride_mg_L)
         dissolved_oxygen_mg_L = calculate_do_saturation(
             temperature_C=temperature_C,
             salinity_psu=salinity_psu,
@@ -170,6 +176,21 @@ def predict_aerated_chloride_corrosion(
 
     # Get ORR diffusion limiting current density from CSV database
     i_lim = _get_orr_limit_from_csv(temperature_C, chloride_mg_L)
+
+    # FIXED: Scale i_lim by DO ratio if user provided a non-saturated DO value
+    # Per Bird-Stewart-Lightfoot mass transfer: i_lim ∝ C_O2
+    if do_was_user_supplied:
+        do_saturated = calculate_do_saturation(
+            temperature_C=temperature_C,
+            salinity_psu=salinity_psu,
+            model="garcia-benson"
+        )
+        if do_saturated > 0:
+            do_ratio = dissolved_oxygen_mg_L / do_saturated
+            i_lim *= do_ratio
+            logger.info(
+                f"Scaled i_lim by DO ratio: {dissolved_oxygen_mg_L:.2f}/{do_saturated:.2f} = {do_ratio:.2f}"
+            )
 
     # Convert limiting current to corrosion rate using Faraday's Law (ASTM G102-89)
     # CR (mm/y) = i * M * 31557600 / (n * F * ρ * 1000)
@@ -213,7 +234,7 @@ def predict_aerated_chloride_corrosion(
             "model": "ORR diffusion-limited corrosion (Faraday's Law per ASTM G102-89)",
             "standards": ["ASTM G102-89 (2015) Calculation of Corrosion Rates from Electrochemical Measurements"],
             "material": material,
-            "do_model": "Garcia-Benson (1992)" if dissolved_oxygen_mg_L is None else "User-supplied",
+            "do_model": "User-supplied" if do_was_user_supplied else "Garcia-Benson (1992)",
             "orr_data_source": "NRL polarization curves (data/orr_diffusion_limits.csv)",
             "validation_datasets": [
                 "NRL seawater polarization curves",

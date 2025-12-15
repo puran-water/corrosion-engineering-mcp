@@ -4,9 +4,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![MCP Compatible](https://img.shields.io/badge/MCP-Compatible-green.svg)](https://github.com/anthropics/mcp)
-[![Phase 3 Complete](https://img.shields.io/badge/Phase-3%20Complete-green.svg)]()
-[![Tests Passing](https://img.shields.io/badge/tests-334%2F334%20passing%20(100%25)-brightgreen.svg)]()
-[![Codex Approved](https://img.shields.io/badge/Codex-Production%20Ready-blue.svg)]()
+[![Version 0.3.0](https://img.shields.io/badge/version-0.3.0-blue.svg)]()
+[![Tests Passing](https://img.shields.io/badge/tests-348%20passing-brightgreen.svg)]()
+[![Tools](https://img.shields.io/badge/tools-14%20MCP%20tools-blue.svg)]()
 
 ---
 
@@ -14,13 +14,12 @@
 
 **Corrosion Engineering MCP Server** is a FastMCP-based toolkit that provides AI agents with access to physics-based corrosion engineering calculations, ranging from rapid handbook lookups to mechanistic electrochemical models with dual-tier pitting assessment.
 
-**Current Status**: Phase 3 Complete (2025-10-20)
-- ✅ **Phase 0-3 Complete**: 334/334 tests passing (100%)
-- ✅ **Codex Validated**: All critical issues resolved
-- ✅ **Mass Transfer Module**: Backend ready for Phase 3.5 integration
+**Current Status**: Version 0.3.0 (2025-12-15)
+- ✅ **348 tests passing** (100% coverage)
+- ✅ **14 MCP tools** with `corrosion_` prefix
 - ✅ **Production Ready**: All critical bugs fixed
 
-See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for complete project status and next steps.
+See [IMPLEMENTATION_ROADMAP.md](IMPLEMENTATION_ROADMAP.md) for implementation history.
 
 ---
 
@@ -108,108 +107,75 @@ Full user guide: [docs/TIER1_VS_TIER2_PITTING_GUIDE.md](docs/TIER1_VS_TIER2_PITT
 ### Tier 0: Handbook Lookup (~0.5 sec)
 **Purpose**: Rapid screening via semantic search on 2,980 vector chunks
 
-**Tools** (3 implemented):
-1. `screen_materials` - Material-environment compatibility
-2. `query_typical_rates` - Empirical corrosion rates
-3. `identify_mechanism` - Mechanism identification + mitigation
-
-**Knowledge Base**: 2,980 chunks from corrosion handbooks
+**Tools** (3):
+- `corrosion_screen_materials` - Material-environment compatibility
+- `corrosion_query_typical_rates` - Empirical corrosion rates
+- `corrosion_identify_mechanism` - Mechanism identification + mitigation
 
 ---
 
 ### Tier 1: Chemistry (~1 sec)
-**Purpose**: Aqueous speciation via PHREEQC
+**Purpose**: Aqueous speciation and scaling indices
 
 **Tools** (2):
-1. ✅ `run_phreeqc_speciation` - pH, ionic strength, saturation indices
-2. 🔄 `calculate_pourbaix` - Potential-pH stability (Phase 2 stub)
+- `corrosion_langelier_index` - Water scaling tendency (Langelier SI)
+- `corrosion_predict_scaling` - Mineral scale prediction
 
 ---
 
 ### Tier 2: Mechanistic Physics (1-5 sec)
 **Purpose**: First-principles electrochemical models
 
-**Tools Implemented** (7):
-
-**Phase 1 - CO₂/H₂S/O₂**:
-1. ✅ `predict_co2_h2s_corrosion` - NORSOK M-506 sweet/sour service
-2. ✅ `predict_aerated_chloride_corrosion` - O₂ mass transfer limited
-
-**Phase 2 - Galvanic**:
-3. ✅ `predict_galvanic_corrosion` - NRL mixed-potential Butler-Volmer solver
-
-**Phase 3 - Localized**:
-4. ✅ `calculate_localized_corrosion` - Dual-tier pitting + crevice assessment
-   - **Tier 1**: PREN/CPT empirical (ASTM G48, ISO 18070)
-   - **Tier 2**: E_pit vs E_mix mechanistic (NRL Butler-Volmer + RedoxState)
-   - Validated: SS316, 316L (alias), 316 (alias)
-   - Known limitation: HY80 at seawater (graceful fallback to Tier 1)
-
-**Planned** (2):
-5. 🔄 `predict_cui_risk` - Corrosion under insulation (DNV-RP-G109)
-6. 🔄 `calculate_dewpoint` - Psychrometric analysis (PsychroLib)
+**Tools** (7):
+- `corrosion_predict_co2_h2s` - NORSOK M-506 sweet/sour service
+- `corrosion_predict_aerated_chloride` - O₂ mass transfer limited
+- `corrosion_assess_galvanic` - NRL mixed-potential Butler-Volmer solver
+- `corrosion_generate_pourbaix` - E-pH stability diagrams
+- `corrosion_get_material_properties` - Alloy database (18+ materials)
+- `corrosion_estimate_service_life` - Remaining life prediction
 
 ---
 
-### Tier 3: Uncertainty Quantification (5-10 sec)
-**Purpose**: Monte Carlo propagation (Phase 4 - planned)
+### Tier 3: Localized Corrosion
+**Purpose**: Pitting/crevice assessment
+
+**Tools** (2):
+- `corrosion_assess_localized` - Dual-tier pitting + crevice
+  - **Tier 1**: PREN/CPT empirical (ASTM G48, ISO 18070)
+  - **Tier 2**: E_pit vs E_mix mechanistic (NRL Butler-Volmer)
+- `corrosion_calculate_pren` - PREN calculation
 
 ---
 
-## Tool Count: 11 Tools Implemented
+## Tool Count: 14 Tools
 
-| Tier | Count | Status |
-|------|-------|--------|
-| Tier 0: Handbook | 3 | ✅ Complete |
-| Tier 1: Chemistry | 1 (+1 stub) | ✅ Complete |
-| Tier 2: Physics | 4 | ✅ Phase 1-3 Complete |
-| Tier 3: Uncertainty | 0 | 🔄 Planned (Phase 4) |
-| **Total** | **8 (+ 3 planned)** | **73% Complete** |
+| Tier | Tools | Count |
+|------|-------|-------|
+| Tier 0: Handbook | screen_materials, query_typical_rates, identify_mechanism | 3 |
+| Tier 1: Chemistry | langelier_index, predict_scaling | 2 |
+| Tier 2: Mechanistic | predict_co2_h2s, predict_aerated_chloride, assess_galvanic, generate_pourbaix, get_material_properties, estimate_service_life | 6 |
+| Tier 3: Localized | assess_localized, calculate_pren | 2 |
+| Info | get_server_info | 1 |
+| **Total** | | **14** |
 
-Plus 1 informational tool: `get_server_info`
+All tools have the `corrosion_` prefix (e.g., `corrosion_screen_materials`).
 
 ---
 
 ## Recent Updates
 
-### Phase 3 Complete: Dual-Tier Pitting Assessment (2025-10-19) ✅
+### Version 0.3.0 (2025-12-15)
+- 14 MCP tools registered with `corrosion_` prefix
+- CSV-backed material properties for 18+ alloys
+- All critical bug fixes from code review complete
+- 348 tests passing
 
-**Deliverables**:
-- ✅ Tier 1 + Tier 2 pitting assessment with graceful degradation
-- ✅ All 4 Codex UX improvements (self-describing, aliases, disagreement detection)
-- ✅ 9 integration tests passing (100%)
-- ✅ Production deployment checklist created
-- ✅ Comprehensive user documentation (600+ lines)
-
-**New Modules** (8):
-- `utils/pitting_assessment.py` - E_pit via NRL Butler-Volmer kinetics
-- `utils/redox_state.py` - DO ↔ Eh conversion (Garcia & Gordon 1992)
-- `utils/nrl_materials.py` - NRL electrochemical database (6 materials)
-- `utils/nrl_constants.py` - Physical constants, reference electrodes
-- `utils/nrl_electrochemical_reactions.py` - ORR, HER, Fe oxidation
-- `tools/mechanistic/predict_galvanic_corrosion.py` - NRL galvanic solver
-- `tools/chemistry/calculate_pourbaix.py` - Simplified Pourbaix (stub)
-- `utils/nacl_solution_chemistry.py` - NaCl solution properties
-
-**Data Files**:
-- 23 NRL coefficient CSVs (HY80, HY100, SS316, Ti, I625, CuNi)
-- 12 MATLAB reference files from NRL GitHub
-
-**Codex Endorsement**:
-> "With the UX polish in place and the HY80 coefficient issue flagged, I see no blockers to shipping Phase 3 for SS316/HY100 use. This feels production-ready for the validated alloys."
-
-Full details: [PHASE3_ELECTROCHEMICAL_PITTING.md](PHASE3_ELECTROCHEMICAL_PITTING.md)
-
----
-
-### Phase 1 Complete: Chemistry + CO₂/H₂S Tools (2025-10-19) ✅
-
-**Tools Implemented**:
-1. `run_phreeqc_speciation` - Aqueous chemistry (pre-existing)
-2. `predict_co2_h2s_corrosion` - NORSOK M-506 wrapper (311 lines)
-3. `predict_aerated_chloride_corrosion` - O₂ mass transfer (373 lines)
-
-**Test Coverage**: 233/233 passing (193 Phase 0 + 40 Phase 1)
+### Key Fixes (0.3.0)
+- Galvanic K constant corrected (A/cm² → mm/year)
+- ipy unit conversion fixed (in/y → mm/y)
+- DO scaling for user-supplied values
+- Zero-CO₂ short-circuit in NORSOK model
+- NORSOK pH clamping (prevents errors for pH > 6.5)
 
 ---
 
@@ -323,33 +289,19 @@ corrosion-engineering-mcp/
 
 ---
 
-## Phase-by-Phase Roadmap
+## Implementation Summary
 
-### ✅ Phase 0: Foundation (Complete)
-- Plugin architecture, state container, Tier 0 tools
-- Authoritative material database (NRL + KittyCAD)
+### Completed Features
+- **Tier 0**: Handbook lookup (semantic search on 2,980 chunks)
+- **Tier 1**: Chemistry (Langelier SI, scaling prediction)
+- **Tier 2**: Mechanistic physics (CO₂/H₂S, aerated chloride, galvanic, Pourbaix)
+- **Tier 3**: Localized corrosion (dual-tier pitting, PREN)
+- **Materials**: NRL database (6 alloys) + CSV database (18+ alloys)
 
-### ✅ Phase 1: Chemistry + CO₂/H₂S (Complete - 2025-10-19)
-- PHREEQC speciation, NORSOK M-506, aerated chloride
-- 233/233 tests passing
-
-### ✅ Phase 2: Galvanic (Complete)
-- NRL mixed-potential galvanic corrosion solver
-- Butler-Volmer electrochemical kinetics (6 materials)
-
-### ✅ Phase 3: Dual-Tier Pitting (Complete - 2025-10-19)
-- Tier 1 (PREN/CPT) + Tier 2 (E_pit vs E_mix)
-- Codex-approved UX improvements
-- 9/9 integration tests passing
-- Production-ready for SS316
-
-### 🔄 Phase 4: CUI + Psychrometrics (Planned)
-- Corrosion under insulation (DNV-RP-G109)
-- Dewpoint calculations (PsychroLib)
-
-### 🔄 Phase 5: Uncertainty Quantification (Planned)
-- Monte Carlo wrapper for all Tier 2 models
-- Sensitivity analysis, tornado diagrams
+### Future Roadmap
+- Corrosion under insulation (CUI) prediction
+- Monte Carlo uncertainty quantification
+- Enhanced PHREEQC integration
 
 ---
 
@@ -515,16 +467,16 @@ MIT License - See LICENSE file for details
 
 ```bibtex
 @software{corrosion_mcp_2025,
-  title={Corrosion Engineering MCP Server: Dual-Tier Pitting Assessment},
+  title={Corrosion Engineering MCP Server},
   author={Puran Water LLC},
   year={2025},
   url={https://github.com/puran-water/corrosion-engineering-mcp},
-  note={Phase 3: Tier 1 (PREN/CPT) + Tier 2 (E_pit vs E_mix) with Codex UX improvements}
+  version={0.3.0}
 }
 ```
 
 ---
 
-**Status**: Phase 3 COMPLETE ✅. Dual-tier pitting assessment production-ready (9/9 tests passing, Codex-approved, SS316 validated).
+**Version**: 0.3.0 | **Tests**: 348 passing | **Tools**: 14
 
-**Last Updated**: 2025-10-19 (Phase 3: Dual-tier pitting with graceful degradation, material aliases, tier disagreement detection)
+**Last Updated**: 2025-12-15

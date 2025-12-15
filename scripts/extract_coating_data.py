@@ -197,7 +197,7 @@ def generate_yaml(extracted_data):
             "source_repo": "corrosion_kb",
             "source_document": "The Corrosion Handbook",
             "source_ref": "corrosion_kb v1.0 (2,980 vector chunks)",
-            "source_url": "https://github.com/hvksh/corrosion-kb",
+            "source_url": "Puran Water internal vector database",
             "parser_version": "1.0",
             "retrieved_at": datetime.now().isoformat() + "Z",
             "notes": (

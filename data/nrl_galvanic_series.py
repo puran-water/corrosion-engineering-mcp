@@ -20,8 +20,8 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 from dataclasses import dataclass
 
-# Location of NRL XML file
-NRL_XML_PATH = Path(__file__).parent / "nrl_csv_files" / "SeawaterPotentialData.xml"
+# Location of NRL XML file (consolidated to external/nrl_coefficients/)
+NRL_XML_PATH = Path(__file__).parent.parent / "external" / "nrl_coefficients" / "SeawaterPotentialData.xml"
 
 # Reference electrode conversion constant (per ASTM G3-14)
 E_SCE_TO_SHE = 0.241  # V

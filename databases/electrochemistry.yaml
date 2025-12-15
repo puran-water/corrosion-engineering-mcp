@@ -8,7 +8,7 @@ metadata:
   source_repos:
     - repo: "corrosion_kb"
       ref: "v1.0 (2,980 vector chunks)"
-      url: "https://github.com/hvksh/corrosion-kb"
+      url: "Puran Water internal vector database"
     - repo: "USNavalResearchLaboratory/corrosion-modeling-applications"
       ref: "master"
       url: "https://github.com/USNavalResearchLaboratory/corrosion-modeling-applications"

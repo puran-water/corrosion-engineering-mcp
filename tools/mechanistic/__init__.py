@@ -12,11 +12,11 @@ These tools implement detailed mechanistic models for:
 All tools integrate with Phase 1 PHREEQC speciation for water chemistry.
 """
 
-from .galvanic_corrosion import calculate_galvanic_corrosion
+from .predict_galvanic_corrosion import predict_galvanic_corrosion
 from .localized_corrosion import calculate_localized_corrosion, calculate_pren
 
 __all__ = [
-    "calculate_galvanic_corrosion",
+    "predict_galvanic_corrosion",
     "calculate_localized_corrosion",
     "calculate_pren",
 ]

@@ -207,10 +207,10 @@ def do_to_eh(
     c_O2_mol_L = dissolved_oxygen_mg_L / (C.MW_O2 * 1000)  # mg/L → mol/L
     p_O2 = c_O2_mol_L / K_H  # atm
 
-    # Check if DO is below detection limit
-    if dissolved_oxygen_mg_L < 0.01:
+    # Check if DO is at or below detection limit (anaerobic conditions)
+    if dissolved_oxygen_mg_L <= 0.01:
         warnings.append(
-            "DO < 0.01 mg/L (anaerobic conditions). Eh calculation assumes ORR "
+            "DO <= 0.01 mg/L (anaerobic conditions). Eh calculation assumes ORR "
             "equilibrium, which may not apply in anaerobic environments where "
             "hydrogen evolution reaction (HER) or sulfate reduction may dominate."
         )

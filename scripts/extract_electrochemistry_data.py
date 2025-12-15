@@ -279,7 +279,7 @@ def generate_yaml(handbook_data, nrl_data):
                 {
                     "repo": "corrosion_kb",
                     "ref": "v1.0 (2,980 vector chunks)",
-                    "url": "https://github.com/hvksh/corrosion-kb",
+                    "url": "Puran Water internal vector database",
                 },
                 {
                     "repo": "USNavalResearchLaboratory/corrosion-modeling-applications",

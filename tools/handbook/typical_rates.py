@@ -183,8 +183,13 @@ class TypicalRatesLookup(HandbookLookup):
                     unit = match[1].lower()
 
                     # Convert to mm/y
-                    if unit in ["mpy", "ipy"]:
+                    # mpy (mils/year): 1 mil = 0.0254 mm, so mpy / 39.37 = mm/y
+                    # ipy (inches/year): 1 inch = 25.4 mm, so ipy * 25.4 = mm/y
+                    if unit == "mpy":
                         rate_mm_y = rate_value / 39.37
+                    elif unit == "ipy":
+                        # FIXED: was / 39.37 (wrong by 1000×)
+                        rate_mm_y = rate_value * 25.4
                     else:
                         rate_mm_y = rate_value
 

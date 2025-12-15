@@ -260,14 +260,20 @@ class TestPHCorrectionFactor:
         assert fpH > 0
         assert 0.1 <= fpH <= 10.0
 
-    def test_ph_out_of_range_raises_error(self):
-        """Test that pH out of NORSOK range raises ValueError"""
-        # pH must be in range 3.5-6.5 per NORSOK M-506 Table A.1
-        with pytest.raises(ValueError, match="pH.*out of.*range"):
-            get_ph_correction_factor(temperature_C=25.0, pH=2.0)
+    def test_ph_out_of_range_clamps_with_warning(self):
+        """Test that pH out of NORSOK range is clamped (not raised)"""
+        # pH values outside 3.5-6.5 are now clamped to bounds with warning
+        # (behavior changed to support upstream chemistry with out-of-range pH)
 
-        with pytest.raises(ValueError, match="pH.*out of.*range"):
-            get_ph_correction_factor(temperature_C=25.0, pH=8.0)
+        # pH below minimum (2.0) should clamp to 3.5
+        fpH_low = get_ph_correction_factor(temperature_C=25.0, pH=2.0)
+        fpH_at_min = get_ph_correction_factor(temperature_C=25.0, pH=3.5)
+        assert fpH_low == fpH_at_min  # Clamped to 3.5
+
+        # pH above maximum (8.0) should clamp to 6.5
+        fpH_high = get_ph_correction_factor(temperature_C=25.0, pH=8.0)
+        fpH_at_max = get_ph_correction_factor(temperature_C=25.0, pH=6.5)
+        assert fpH_high == fpH_at_max  # Clamped to 6.5
 
     def test_temperature_out_of_range_raises_error(self):
         """Test that temperature out of NORSOK range raises ValueError"""

@@ -765,14 +765,16 @@ class TestMCPServerIntegration:
         # Use FastMCP in-memory client for proper protocol testing
         async with Client(mcp) as client:
             result = await client.call_tool(
-                "assess_galvanic_corrosion",
+                "corrosion_assess_galvanic",
                 {
-                    "anode_material": "HY80",
-                    "cathode_material": "SS316",
-                    "temperature_C": 25.0,
-                    "pH": 7.5,
-                    "chloride_mg_L": 800.0,
-                    "area_ratio_cathode_to_anode": 50.0
+                    "params": {
+                        "anode_material": "HY80",
+                        "cathode_material": "SS316",
+                        "temperature_C": 25.0,
+                        "pH": 7.5,
+                        "chloride_mg_L": 800.0,
+                        "area_ratio_cathode_to_anode": 50.0
+                    }
                 }
             )
 
@@ -806,15 +808,17 @@ class TestMCPServerIntegration:
 
         async with Client(mcp) as client:
             result = await client.call_tool(
-                "assess_galvanic_corrosion",
+                "corrosion_assess_galvanic",
                 {
-                    "anode_material": "HY80",
-                    "cathode_material": "SS316",
-                    "temperature_C": 25.0,
-                    "pH": 7.5,
-                    "chloride_mg_L": 800.0,
-                    "area_ratio_cathode_to_anode": 50.0,
-                    "dissolved_oxygen_mg_L": 5.0
+                    "params": {
+                        "anode_material": "HY80",
+                        "cathode_material": "SS316",
+                        "temperature_C": 25.0,
+                        "pH": 7.5,
+                        "chloride_mg_L": 800.0,
+                        "area_ratio_cathode_to_anode": 50.0,
+                        "dissolved_oxygen_mg_L": 5.0
+                    }
                 }
             )
 
@@ -833,16 +837,18 @@ class TestMCPServerIntegration:
         from server import mcp
 
         async with Client(mcp) as client:
-            # Invalid material should raise ToolError with RuntimeError message
-            with pytest.raises(ToolError, match="Galvanic corrosion tool failed"):
+            # Invalid material should raise ToolError with validation error
+            with pytest.raises(ToolError, match="INVALID_MATERIAL.*not supported"):
                 await client.call_tool(
-                    "assess_galvanic_corrosion",
+                    "corrosion_assess_galvanic",
                     {
-                        "anode_material": "INVALID_MATERIAL",
-                        "cathode_material": "SS316",
-                        "temperature_C": 25.0,
-                        "pH": 7.5,
-                        "chloride_mg_L": 800.0
+                        "params": {
+                            "anode_material": "INVALID_MATERIAL",
+                            "cathode_material": "SS316",
+                            "temperature_C": 25.0,
+                            "pH": 7.5,
+                            "chloride_mg_L": 800.0
+                        }
                     }
                 )
 

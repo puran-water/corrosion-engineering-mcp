@@ -164,9 +164,10 @@ class TestEhtoDO:
 
         DO, warnings = eh_to_do(Eh, pH, T)
 
-        # Should be near saturation
+        # Should be near saturation (Eh=0.8V is ~15mV below air-equilibrium ~0.805V,
+        # so expect ~47% sat per Nernst equation, not quite 50%)
         DO_sat = do_saturation(T)
-        assert DO > 0.5 * DO_sat, \
+        assert DO > 0.45 * DO_sat, \
             f"High Eh ({Eh} V) should give significant DO: {DO:.2f} mg/L"
 
     def test_reducing_conditions(self):
@@ -311,13 +312,18 @@ class TestTemperatureEffects:
     """Test temperature-dependent calculations."""
 
     def test_henry_constant_temperature_dependence(self):
-        """Henry's constant should increase with T (less soluble)."""
+        """Henry's constant (K_H = c/p, mol·L⁻¹·atm⁻¹) should DECREASE with T.
+
+        Gas solubility decreases with temperature, so the solubility constant
+        K_H = c/p decreases. This is distinct from the "inverse Henry constant"
+        (p/c) which would increase with temperature.
+        """
         temps = [5, 15, 25, 35]
         K_Hs = [henry_constant_o2(T) for T in temps]
 
         for i in range(len(temps) - 1):
-            assert K_Hs[i] < K_Hs[i+1], \
-                f"K_H should increase with T (less soluble): {K_Hs[i]:.2e} < {K_Hs[i+1]:.2e}"
+            assert K_Hs[i] > K_Hs[i+1], \
+                f"K_H should decrease with T (less soluble): {K_Hs[i]:.2e} > {K_Hs[i+1]:.2e}"
 
     def test_nernst_temperature_correction(self):
         """Nernst equation slope should change with temperature."""

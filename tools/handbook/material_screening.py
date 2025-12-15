@@ -194,12 +194,15 @@ class MaterialScreeningLookup(HandbookLookup):
                 unit = match.group(3)
 
                 # Convert to mm/y if needed
+                # mpy (mils/year): 1 mil = 0.0254 mm, so mpy / 39.37 = mm/y
+                # ipy (inches/year): 1 inch = 25.4 mm, so ipy * 25.4 = mm/y
                 if unit == "mpy":
                     min_rate /= 39.37
                     max_rate /= 39.37
                 elif unit == "ipy":
-                    min_rate /= 39.37
-                    max_rate /= 39.37
+                    # FIXED: was /= 39.37 (wrong by 1000×)
+                    min_rate *= 25.4
+                    max_rate *= 25.4
 
                 return (min_rate, max_rate)
 

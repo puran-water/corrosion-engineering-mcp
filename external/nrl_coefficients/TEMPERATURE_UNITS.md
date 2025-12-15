@@ -173,9 +173,7 @@ This temperature unit requirement was not explicitly documented in the original 
 ## References
 
 1. NRL MATLAB Reference: `external/nrl_matlab_reference/ElectrochemicalReductionReaction.m`
-2. Bug Report: `docs/CRITICAL_BUG_FIXES_2025-10-20.md`
-3. Python Implementation: `utils/nrl_materials.py:289`
-4. Codex Investigation Session: `/home/hvksh/.codex/sessions/2025/10/20/`
+2. Python Implementation: `utils/nrl_materials.py:_apply_polynomial_response_surface()`
 
 ---
 

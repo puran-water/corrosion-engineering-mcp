@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "corrosion-engineering-mcp": {
+      "type": "stdio",
+      "command": "<path-to-python>",
+      "args": [
+        "<path-to-project>/server.py"
+      ],
+      "env": {
+        "MCP_TIMEOUT": "600000",
+        "MCP_TOOL_TIMEOUT": "600",
+        "CORROSION_MCP_ROOT": "<path-to-project>"
+      },
+      "autoApprove": [
+        "screen_materials",
+        "query_typical_rates",
+        "identify_mechanism",
+        "assess_galvanic_corrosion",
+        "generate_pourbaix_diagram",
+        "get_material_properties",
+        "get_server_info"
+      ]
+    }
+  }
+}

@@ -84,7 +84,14 @@ Repository = "https://github.com/puran-water/corrosion-engineering-mcp"
 Issues = "https://github.com/puran-water/corrosion-engineering-mcp/issues"
 
 [tool.setuptools]
-packages = ["core", "tools", "utils", "data", "validation", "external"]
+packages = ["core", "tools", "utils", "data", "validation", "external", "databases"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"*" = ["*.csv", "*.yaml", "*.yml", "*.xml", "*.json"]
+data = ["*.csv"]
+external = ["nrl_coefficients/*.csv", "nrl_coefficients/*.md", "nrl_coefficients/*.xml"]
+databases = ["*.yaml", "*.yml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

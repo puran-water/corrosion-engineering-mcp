@@ -10,6 +10,9 @@
 
 ---
 
+
+> **⚠️ DEVELOPMENT STATUS: This project is under active development and is not yet production-ready. APIs, interfaces, and functionality may change without notice. Use at your own risk for evaluation and testing purposes only. Not recommended for production deployments.**
+
 ## Overview
 
 **Corrosion Engineering MCP Server** is a FastMCP-based toolkit that provides AI agents with access to physics-based corrosion engineering calculations, ranging from rapid handbook lookups to mechanistic electrochemical models with dual-tier pitting assessment.

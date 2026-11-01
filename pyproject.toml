@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "corrosion-engineering-mcp"
+version = "0.1.0"
+description = "Corrosion chemistry and explicit screening calculations, with unsupported predictions identified in results."
+requires-python = ">=3.12"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE*", "NOTICE", "THIRD-PARTY-NOTICES/**/*"]
+authors = [{name = "Puran Water"}]
+dependencies = [
+  "fastmcp>=3.0",
+  "numpy>=1.24.0",
+  "scipy>=1.10.0",
+  "pandas>=2.0.0",
+  "pydantic>=2.0.0",
+  "phreeqpython>=1.5.5",
+  "fluids>=1.2.0",
+  "ht>=1.0.0",
+  "requests>=2.31.0",
+  "requests-cache>=1.1.0",
+  "lxml>=4.9.0",
+  "python-dotenv>=1.0.0",
+  "pyyaml>=6.0",
+  "puran-mcp-support[chemistry]==0.1.0"
+]
+
+[project.scripts]
+corrosion-engineering-mcp = "corrosion_engineering_mcp.__main__:main"
+
+[project.urls]
+Homepage = "https://puranwater.com"
+Repository = "https://github.com/puran-water/corrosion-engineering-mcp"
+Issues = "https://github.com/puran-water/corrosion-engineering-mcp/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/corrosion_engineering_mcp"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "README.md", "LICENSE*", "NOTICE", "THIRD-PARTY-NOTICES", "LICENSE-TABLE.md", "SCAN-REPORT.md", "TEST-RESULTS.md", "HISTORICAL-QUALITY.md", "RESOURCE-LICENSES.csv", "KNOWN-ISSUES.md", "pyproject.toml"]

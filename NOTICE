@@ -1,0 +1,17 @@
+Puran Water MCP release 0.1.0. Original project code retains its LICENSE.
+
+Separately licensed upstream code and data are governed by the notices below, not relicensed by the wrapper.
+
+Required upstream copyright and attribution are reproduced verbatim. No endorsement is implied.
+
+Vendored NRL coefficient/XML resources and supporting code: https://github.com/USNavalResearchLaboratory/corrosion-modeling-applications — MIT, not an assumed public-domain grant.
+
+Modified NORSOK implementation (Puran Water validation, units and numerical corrections): https://github.com/dungnguyen2/norsokm506 — MIT. This does not reproduce or license a standards publication.
+
+Bundled phreeqc.dat and pitzer.dat originate in https://github.com/Vitens/phreeqpython/tree/f486d6ba55b19223a3fb3e456149369ee9977db1/phreeqpython/database .
+
+PHREEQC software and related data: USGS User Rights Notice (included). PhreeqPython distribution: Apache-2.0 (included).
+
+pitzer.dat is unchanged. phreeqc.dat has trailing whitespace removed; no numeric/database reactions changed. Puran Water adds a comment identifying this release modification on 2026-10-31.
+
+Original PHREEQC distribution and sources: https://github.com/phreeqc-dev/phreeqc3 . This release does not bundle Amm.dat or other unclear datasets.

@@ -2,7 +2,17 @@
 
 Corrosion chemistry and explicit screening calculations, with unsupported predictions identified in results.
 
-Experimental v0.1.0. These tools return calculations and structured evidence; the calling LLM supplies explanations and reporting. Engineering review remains necessary.
+Experimental release series; `v0.1.0` is the initial pinned release and `main` follows current development. These tools return calculations and structured evidence; the calling LLM supplies explanations and reporting. Engineering review remains necessary.
+
+## Use it in an engineering workflow
+
+**A corrosion-screening question.** Supply material, water chemistry, temperature and relevant gas or flow conditions. Inspect the selected method, validity limits and unsupported-prediction flags.
+
+A screening result is not a remaining-life prediction or a material warranty.
+
+This is a public calculation component of [Puran Water's engineering toolchain](https://github.com/puran-water). The working system connects these tools to sizing-to-balance, proposal and BEP procedures and retained Studio review publications. Those internal workflows and project records are separate from this standalone package.
+
+Have a project that needs engineering interpretation or an independent review? [Work with Puran Water](https://puranwater.com/contact/). To report a software defect, open a repository issue with a minimal synthetic or redacted input, package revision, expected result and actual result.
 
 ## Quick start
 
@@ -66,7 +76,7 @@ package together from the current branches in your existing environment:
 
 ```sh
 uv pip install --upgrade --reinstall \
-  "puran-mcp-support[simulation] @ git+https://github.com/puran-water/fluids-mcp.git@main#subdirectory=support/puran-mcp-support" \
+  "puran-mcp-support @ git+https://github.com/puran-water/fluids-mcp.git@main#subdirectory=support/puran-mcp-support" \
   "corrosion-engineering-mcp @ git+https://github.com/puran-water/corrosion-engineering-mcp.git@main"
 ```
 
